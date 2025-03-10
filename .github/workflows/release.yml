@@ -69,7 +69,7 @@ jobs:
                 uses: actions/upload-artifact@v4
                 with:
                     name: build
-                    path: ROR.Net\bin
+                    path: NWOpen.Net\bin
             -   name: Test the project
                 shell: bash
                 run: |
