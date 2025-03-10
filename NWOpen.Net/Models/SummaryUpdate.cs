@@ -11,7 +11,8 @@ public class SummaryUpdate
     public DateTime? SubmissionDate { get; set; }
 
     /// <summary>
-    /// Update of the public summary of the project in Dutch. In the case de public summary is empty, the scientific summary will be returned.
+    /// Update of the public summary of the project in Dutch. In the case de public summary is empty, the scientific summary
+    /// will be returned.
     /// </summary>
     [JsonPropertyName("update_en")]
     public required string UpdateEn { get; set; }

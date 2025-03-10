@@ -6,7 +6,7 @@ using Moq.Protected;
 using NWOpen.Net.Models;
 using NWOpen.Net.Services;
 
-namespace NWOpen.Testing;
+namespace NWOpen.Tests;
 
 public class NwOpenServiceTests
 {
@@ -16,10 +16,10 @@ public class NwOpenServiceTests
 
     public NwOpenServiceTests()
     {
-        _httpMessageHandlerMock = new Mock<HttpMessageHandler>();
+        _httpMessageHandlerMock = new();
         HttpClient httpClient = new(_httpMessageHandlerMock.Object);
-        _loggerMock = new Mock<ILogger<NWOpenService>>();
-        _nwOpenService = new NWOpenService(httpClient, _loggerMock.Object);
+        _loggerMock = new();
+        _nwOpenService = new(httpClient, _loggerMock.Object);
     }
 
     [Fact]
@@ -30,7 +30,8 @@ public class NwOpenServiceTests
             ProjectId = "20447",
             GrantId = null,
             ParentProjectId = null,
-            Title = "Hybrid protein-lipid nanoparticles for targeted oligonucleotide delivery in endometriosis (HYPNODE)",
+            Title =
+                "Hybrid protein-lipid nanoparticles for targeted oligonucleotide delivery in endometriosis (HYPNODE)",
             FundingSchemeId = 4851,
             FundingScheme = "Open technologieprogramma OTP 2022 2022-9",
             Department = "Toegepaste en Technische Wetenschappen",
@@ -40,7 +41,9 @@ public class NwOpenServiceTests
             SummaryNl = "summarynl",
             SummaryEn = "summaryen",
             SummaryUpdates = [],
-            ProjectMembers = [new ProjectMember
+            ProjectMembers =
+            [
+                new ProjectMember
                 {
                     Role = "Researcher",
                     MemberId = 557530,
@@ -54,10 +57,11 @@ public class NwOpenServiceTests
                     DegreePreNominal = null,
                     DegreePostNominal = null,
                     Dai = null,
-                    Ror = null
-                }
+                    Ror = null,
+                },
             ],
-            Products = [
+            Products =
+            [
                 new Product
                 {
                     Title = "The Posttransit Tail of WASP-107b Observed at 10830 Å",
@@ -68,7 +72,8 @@ public class NwOpenServiceTests
                     Type = "Wetenschappelijk artikel",
                     UrlOpenAccess = "10.3847/1538-3881/ac178a",
                     JournalTitle = "The Astronomical Journal",
-                    Authors = [
+                    Authors =
+                    [
                         new Author
                         {
                             LastName = "Spake",
@@ -76,22 +81,22 @@ public class NwOpenServiceTests
                             FirstName = null,
                             Prefix = null,
                             Role = "Auteur",
-                            IndexNumber = null
-                        }
+                            IndexNumber = null,
+                        },
                     ],
                     City = null,
                     Publisher = null,
                     SubTitle = null,
                     Isbn = null,
-                    Doi = null
-                }
-            ]
+                    Doi = null,
+                },
+            ],
         };
 
         NWOpenResult mockResult = new()
         {
             Projects = [project],
-            Metadata = new Metadata
+            Metadata = new()
             {
                 ApiType = "NWO Projects API",
                 Version = "1.0.1",
@@ -113,15 +118,16 @@ public class NwOpenServiceTests
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage
             {
-                StatusCode = HttpStatusCode.OK,
-                Content = JsonContent.Create(mockResult),
+                StatusCode = HttpStatusCode.OK, Content = JsonContent.Create(mockResult),
             });
 
         Project? result = await _nwOpenService.GetProject("20447");
 
         Assert.NotNull(result);
         Assert.Equal("20447", result.ProjectId);
-        Assert.Equal("Hybrid protein-lipid nanoparticles for targeted oligonucleotide delivery in endometriosis (HYPNODE)", result.Title);
+        Assert.Equal(
+            "Hybrid protein-lipid nanoparticles for targeted oligonucleotide delivery in endometriosis (HYPNODE)",
+            result.Title);
     }
 
     [Fact]
@@ -156,8 +162,7 @@ public class NwOpenServiceTests
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage
             {
-                StatusCode = HttpStatusCode.OK,
-                Content = new StringContent("Invalid JSON"),
+                StatusCode = HttpStatusCode.OK, Content = new StringContent("Invalid JSON"),
             });
 
         Project? result = await _nwOpenService.GetProject("123");

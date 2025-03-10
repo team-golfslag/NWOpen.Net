@@ -49,7 +49,9 @@ public sealed class NWOpenService(
     {
         try
         {
-            NWOpenResult? result = await httpClient.GetFromJsonAsync<NWOpenResult>($"{_options.BaseUrl}?project_id={id}", _options.JsonSerializerOptions);
+            NWOpenResult? result =
+                await httpClient.GetFromJsonAsync<NWOpenResult>($"{_options.BaseUrl}?project_id={id}",
+                    _options.JsonSerializerOptions);
             return result?.Projects.FirstOrDefault();
         }
         catch (HttpRequestException e)

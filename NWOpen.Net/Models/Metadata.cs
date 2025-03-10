@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace NWOpen.Net.Models;
 
-
 public class Metadata : ICombinable<Metadata>
 {
     /// <summary>
@@ -65,17 +64,18 @@ public class Metadata : ICombinable<Metadata>
     [JsonPropertyName("page")]
     public int? Page { get; set; }
 
-    public Metadata Combine(Metadata other) => new()
-    {
-        ApiType = other.ApiType,
-        Version = other.Version,
-        ReleaseDate = other.ReleaseDate,
-        Funder = other.Funder,
-        RorId = other.RorId,
-        Date = other.Date,
-        Count = other.Count + Count,
-        PerPage = other.PerPage,
-        Pages = other.Pages,
-        Page = other.Page
-    };
+    public Metadata Combine(Metadata other) =>
+        new()
+        {
+            ApiType = other.ApiType,
+            Version = other.Version,
+            ReleaseDate = other.ReleaseDate,
+            Funder = other.Funder,
+            RorId = other.RorId,
+            Date = other.Date,
+            Count = other.Count + Count,
+            PerPage = other.PerPage,
+            Pages = other.Pages,
+            Page = other.Page,
+        };
 }

@@ -15,10 +15,20 @@ public class NWOpenServiceOptions
     /// The options for the JSON serializer.
     /// </summary>
     /// <value>
-    /// The default value is a new instance of <see cref="JsonSerializerOptions"/> with the following settings:
+    /// The default value is a new instance of <see cref="JsonSerializerOptions" /> with the following settings:
     /// <list type="bullet">
-    /// <item><description><see cref="JsonSerializerOptions.PropertyNamingPolicy"/> = <see cref="JsonNamingPolicy.SnakeCaseLower"/></description></item>
-    /// <item><description><see cref="JsonSerializerOptions.Converters"/> = { new <see cref="JsonStringEnumConverter"/> (<see cref="JsonNamingPolicy.SnakeCaseLower"/>) }</description></item>
+    /// <item>
+    /// <description>
+    /// <see cref="System.Text.Json.JsonSerializerOptions.PropertyNamingPolicy" /> =
+    /// <see cref="JsonNamingPolicy.SnakeCaseLower" />
+    /// </description>
+    /// </item>
+    /// <item>
+    /// <description>
+    /// <see cref="JsonSerializerOptions.Converters" /> = { new <see cref="JsonStringEnumConverter" /> (
+    /// <see cref="JsonNamingPolicy.SnakeCaseLower" />) }
+    /// </description>
+    /// </item>
     /// </list>
     /// </value>
     public JsonSerializerOptions JsonSerializerOptions { get; set; } = new()
