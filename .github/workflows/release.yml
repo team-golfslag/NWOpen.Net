@@ -65,6 +65,11 @@ jobs:
                 shell: bash
                 run: |
                     dotnet build --no-incremental
+            -   name: Upload build as Artifact
+                uses: actions/upload-artifact@v4
+                with:
+                    name: build
+                    path: ROR.Net\bin
             -   name: Test the project
                 shell: bash
                 run: |
