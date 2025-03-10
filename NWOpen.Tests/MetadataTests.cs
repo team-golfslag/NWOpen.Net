@@ -1,6 +1,6 @@
 using NWOpen.Net.Models;
 
-namespace NWOpen.Testing;
+namespace NWOpen.Tests;
 
 public class MetadataTests
 {

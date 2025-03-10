@@ -10,9 +10,10 @@ public class NWOpenResult : ICombinable<NWOpenResult>
     [JsonPropertyName("projects")]
     public required List<Project> Projects { get; set; }
 
-    public NWOpenResult Combine(NWOpenResult other) => new()
-    {
-        Metadata = Metadata.Combine(other.Metadata),
-        Projects = Projects.Concat(other.Projects).ToList()
-    };
+    public NWOpenResult Combine(NWOpenResult other) =>
+        new()
+        {
+            Metadata = Metadata.Combine(other.Metadata),
+            Projects = Projects.Concat(other.Projects).ToList()
+        };
 }

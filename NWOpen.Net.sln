@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NWOpen.Net", "NWOpen.Net\NWOpen.Net.csproj", "{DAF73421-2CB2-4F31-9EAB-DD48C2441A53}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NWOpen.Testing", "NWOpen.Testing\NWOpen.Testing.csproj", "{A9997D05-0D5F-4A78-A52A-1A82753FA621}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NWOpen.Tests", "NWOpen.Tests\NWOpen.Tests.csproj", "{A9997D05-0D5F-4A78-A52A-1A82753FA621}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

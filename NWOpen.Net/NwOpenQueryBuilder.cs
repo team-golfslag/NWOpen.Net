@@ -10,14 +10,27 @@ namespace NWOpen.Net;
 public class NwOpenQueryBuilder
 {
     /// <summary>
+    /// The number of results per page.
+    /// </summary>
+    private const int PageSize = 100;
+
+    /// <summary>
     /// The service to use to perform the query.
     /// </summary>
     private readonly NWOpenService _service;
 
+    private DateTime? _endDateFrom;
+    private DateTime? _endDateUntil;
+
     /// <summary>
-    /// The number of results per page.
+    /// The last name to filter by.
     /// </summary>
-    private const int PageSize = 100;
+    private string? _lastNameQuery;
+
+    /// <summary>
+    /// The amount of results to return.
+    /// </summary>
+    private int? _numberOfResults;
 
     /// <summary>
     /// The organization to filter by.
@@ -25,9 +38,12 @@ public class NwOpenQueryBuilder
     private string? _organizationQuery;
 
     /// <summary>
-    /// The title to filter by.
+    /// The role to filter by.
     /// </summary>
-    private string? _titleQuery;
+    private string? _roleQuery;
+
+    private DateTime? _startDateFrom;
+    private DateTime? _startDateUntil;
 
     /// <summary>
     /// Whether the title should be an exact match.
@@ -35,26 +51,14 @@ public class NwOpenQueryBuilder
     private bool? _titleExact;
 
     /// <summary>
-    /// The role to filter by.
+    /// The title to filter by.
     /// </summary>
-    private string? _roleQuery;
-    /// <summary>
-    /// The last name to filter by.
-    /// </summary>
-    private string? _lastNameQuery;
+    private string? _titleQuery;
 
-    private DateTime? _startDateFrom;
-    private DateTime? _startDateUntil;
-
-    private DateTime? _endDateFrom;
-    private DateTime? _endDateUntil;
-
-    /// <summary>
-    /// The amount of results to return.
-    /// </summary>
-    private int? _numberOfResults;
-
-    internal NwOpenQueryBuilder(NWOpenService service) => _service = service;
+    internal NwOpenQueryBuilder(NWOpenService service)
+    {
+        _service = service;
+    }
 
     /// <summary>
     /// Filter by project organization.
@@ -223,13 +227,10 @@ public class NwOpenQueryBuilder
             newCount++;
             projects.Add(project);
         }
+
         result.Metadata.Count = newCount;
 
-        return new NWOpenResult
-        {
-            Projects = projects,
-            Metadata = result.Metadata
-        };
+        return new() { Projects = projects, Metadata = result.Metadata };
     }
 
     /// <summary>
@@ -253,7 +254,6 @@ public class NwOpenQueryBuilder
     /// <summary>
     /// Build the query for a specific page.
     /// </summary>
-    ///
     /// <param name="page">The page to build the query for.</param>
     /// <returns> The query </returns>
     private string BuildQuery(int? page)

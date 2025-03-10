@@ -5,8 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
-        <AssemblyName>NWOpen.Testing</AssemblyName>
-        <RootNamespace>NWOpen.Testing</RootNamespace>
+        <PackageId>NWOpen.Tests</PackageId>
     </PropertyGroup>
 
     <ItemGroup>
@@ -22,7 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\NWOpen.Net\NWOpen.Net.csproj" />
+        <ProjectReference Include="..\NWOpen.Net\NWOpen.Net.csproj"/>
     </ItemGroup>
 
 </Project>

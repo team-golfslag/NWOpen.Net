@@ -7,7 +7,7 @@ using NWOpen.Net;
 using NWOpen.Net.Models;
 using NWOpen.Net.Services;
 
-namespace NWOpen.Testing;
+namespace NWOpen.Tests;
 
 public class NwOpenQueryBuilderTests
 {
@@ -17,10 +17,10 @@ public class NwOpenQueryBuilderTests
 
     public NwOpenQueryBuilderTests()
     {
-        _httpMessageHandlerMock = new Mock<HttpMessageHandler>();
+        _httpMessageHandlerMock = new();
         HttpClient httpClient = new(_httpMessageHandlerMock.Object);
-        _loggerMock = new Mock<ILogger<NWOpenService>>();
-        _nwOpenService = new NWOpenService(httpClient, _loggerMock.Object);
+        _loggerMock = new();
+        _nwOpenService = new(httpClient, _loggerMock.Object);
     }
 
     [Fact]
@@ -31,7 +31,8 @@ public class NwOpenQueryBuilderTests
             ProjectId = "20447",
             GrantId = null,
             ParentProjectId = null,
-            Title = "Hybrid protein-lipid nanoparticles for targeted oligonucleotide delivery in endometriosis (HYPNODE)",
+            Title =
+                "Hybrid protein-lipid nanoparticles for targeted oligonucleotide delivery in endometriosis (HYPNODE)",
             FundingSchemeId = 4851,
             FundingScheme = "Open technologieprogramma OTP 2022 2022-9",
             Department = "Toegepaste en Technische Wetenschappen",
@@ -59,11 +60,7 @@ public class NwOpenQueryBuilderTests
             Page = 2,
         };
 
-        NWOpenResult organizationResult = new()
-        {
-            Metadata = metadata,
-            Projects = [organization],
-        };
+        NWOpenResult organizationResult = new() { Metadata = metadata, Projects = [organization] };
 
         _httpMessageHandlerMock.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -72,8 +69,7 @@ public class NwOpenQueryBuilderTests
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage
             {
-                StatusCode = HttpStatusCode.OK,
-                Content = JsonContent.Create(organizationResult),
+                StatusCode = HttpStatusCode.OK, Content = JsonContent.Create(organizationResult),
             });
 
         NwOpenQueryBuilder queryBuilder = _nwOpenService
@@ -86,7 +82,9 @@ public class NwOpenQueryBuilderTests
         Assert.NotNull(result);
         Assert.Single(result.Projects);
         Assert.Equal("20447", result.Projects[0].ProjectId);
-        Assert.Equal("Hybrid protein-lipid nanoparticles for targeted oligonucleotide delivery in endometriosis (HYPNODE)", result.Projects[0].Title);
+        Assert.Equal(
+            "Hybrid protein-lipid nanoparticles for targeted oligonucleotide delivery in endometriosis (HYPNODE)",
+            result.Projects[0].Title);
     }
 
     [Fact]
@@ -99,8 +97,7 @@ public class NwOpenQueryBuilderTests
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage
             {
-                StatusCode = HttpStatusCode.OK,
-                Content = new StringContent("Invalid JSON"),
+                StatusCode = HttpStatusCode.OK, Content = new StringContent("Invalid JSON"),
             });
 
         NwOpenQueryBuilder queryBuilder = _nwOpenService
@@ -179,14 +176,16 @@ public class NwOpenQueryBuilderTests
             .WithTitle("Test")
             .WithNumberOfResults(1)
             .WithMemberLastName("Doe")
-            .WithStartDateFrom(new DateTime(2020, 1, 1))
-            .WithStartDateUntil(new DateTime(2021, 1, 1))
-            .WithEndDateFrom(new DateTime(2021, 1, 1))
-            .WithEndDateUntil(new DateTime(2022, 1, 1))
+            .WithStartDateFrom(new(2020, 1, 1))
+            .WithStartDateUntil(new(2021, 1, 1))
+            .WithEndDateFrom(new(2021, 1, 1))
+            .WithEndDateUntil(new(2022, 1, 1))
             .WithRole("role");
 
         string query = queryBuilder.BuildQueries()[0];
 
-        Assert.Equal("per_page=1&organisation=%22Test%22&title=%22Test%22&role=%22role%22&last_name=%22Doe%22&rs_start_date=2020-01-01&re_start_date=2021-01-01&rs_end_date=2021-01-01&re_end_date=2022-01-01", query);
+        Assert.Equal(
+            "per_page=1&organisation=%22Test%22&title=%22Test%22&role=%22role%22&last_name=%22Doe%22&rs_start_date=2020-01-01&re_start_date=2021-01-01&rs_end_date=2021-01-01&re_end_date=2022-01-01",
+            query);
     }
 }
