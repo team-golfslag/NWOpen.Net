@@ -1,3 +1,8 @@
+// This program has been developed by students from the bachelor Computer Science at Utrecht
+// University within the Software Project course.
+// 
+// © Copyright Utrecht University (Department of Information and Computing Sciences)
+
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
@@ -60,7 +65,11 @@ public class NwOpenQueryBuilderTests
             Page = 2,
         };
 
-        NWOpenResult organizationResult = new() { Metadata = metadata, Projects = [organization] };
+        NWOpenResult organizationResult = new()
+        {
+            Metadata = metadata,
+            Projects = [organization],
+        };
 
         _httpMessageHandlerMock.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -69,7 +78,8 @@ public class NwOpenQueryBuilderTests
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage
             {
-                StatusCode = HttpStatusCode.OK, Content = JsonContent.Create(organizationResult),
+                StatusCode = HttpStatusCode.OK,
+                Content = JsonContent.Create(organizationResult),
             });
 
         NwOpenQueryBuilder queryBuilder = _nwOpenService
@@ -97,7 +107,8 @@ public class NwOpenQueryBuilderTests
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage
             {
-                StatusCode = HttpStatusCode.OK, Content = new StringContent("Invalid JSON"),
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent("Invalid JSON"),
             });
 
         NwOpenQueryBuilder queryBuilder = _nwOpenService

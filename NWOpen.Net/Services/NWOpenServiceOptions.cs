@@ -1,3 +1,8 @@
+// This program has been developed by students from the bachelor Computer Science at Utrecht
+// University within the Software Project course.
+// 
+// © Copyright Utrecht University (Department of Information and Computing Sciences)
+
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -34,6 +39,9 @@ public class NWOpenServiceOptions
     public JsonSerializerOptions JsonSerializerOptions { get; set; } = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
-        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower) },
+        Converters =
+        {
+            new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower),
+        },
     };
 }
