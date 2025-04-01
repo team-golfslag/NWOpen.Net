@@ -1,3 +1,8 @@
+// This program has been developed by students from the bachelor Computer Science at Utrecht
+// University within the Software Project course.
+// 
+// © Copyright Utrecht University (Department of Information and Computing Sciences)
+
 using NWOpen.Net.Models;
 
 namespace NWOpen.Tests;
@@ -6,7 +11,7 @@ public class NWOpenResultTests
 {
     private readonly NWOpenResult _result1 = new()
     {
-        Metadata =  new()
+        Metadata = new()
         {
             ApiType = "NWO Projects API",
             Version = "1.0.1",
@@ -24,7 +29,7 @@ public class NWOpenResultTests
 
     private readonly NWOpenResult _result2 = new()
     {
-        Metadata =  new()
+        Metadata = new()
         {
             ApiType = "NWO Projects API",
             Version = "1.0.1",
@@ -39,13 +44,12 @@ public class NWOpenResultTests
         },
         Projects = [],
     };
-       
 
     [Fact]
     public void Combine_ShouldCombineMetadata()
     {
         NWOpenResult result = _result1.Combine(_result2);
-        
+
         Assert.Equal(35, result.Metadata.Count);
     }
 }

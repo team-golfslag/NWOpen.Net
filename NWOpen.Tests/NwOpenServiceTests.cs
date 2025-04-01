@@ -1,3 +1,8 @@
+// This program has been developed by students from the bachelor Computer Science at Utrecht
+// University within the Software Project course.
+// 
+// © Copyright Utrecht University (Department of Information and Computing Sciences)
+
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
@@ -118,7 +123,8 @@ public class NwOpenServiceTests
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage
             {
-                StatusCode = HttpStatusCode.OK, Content = JsonContent.Create(mockResult),
+                StatusCode = HttpStatusCode.OK,
+                Content = JsonContent.Create(mockResult),
             });
 
         Project? result = await _nwOpenService.GetProject("20447");
@@ -162,7 +168,8 @@ public class NwOpenServiceTests
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage
             {
-                StatusCode = HttpStatusCode.OK, Content = new StringContent("Invalid JSON"),
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent("Invalid JSON"),
             });
 
         Project? result = await _nwOpenService.GetProject("123");
