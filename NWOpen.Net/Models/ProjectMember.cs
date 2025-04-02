@@ -13,7 +13,7 @@ public class ProjectMember
     /// Role of the project member within the project. Possible returned
     /// </summary>
     [JsonPropertyName("role")]
-    public required string Role { get; set; }
+    public string? Role { get; set; }
 
     /// <summary>
     /// ID for the project member.
@@ -32,7 +32,7 @@ public class ProjectMember
     /// Last name of the project member.
     /// </summary>
     [JsonPropertyName("last_name")]
-    public required string LastName { get; set; }
+    public string? LastName { get; set; }
 
     /// <summary>
     /// Initials of the project member.
@@ -50,7 +50,7 @@ public class ProjectMember
     /// Insert before the name.
     /// </summary>
     [JsonPropertyName("organisation")]
-    public required string Organisation { get; set; }
+    public string? Organisation { get; set; }
 
     /// <summary>
     /// Organization where the project member is working for the project.
