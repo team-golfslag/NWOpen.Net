@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
 using NWOpen.Net;
+using NWOpen.Net.Exceptions;
 using NWOpen.Net.Models;
 using NWOpen.Net.Services;
 
@@ -17,15 +18,13 @@ namespace NWOpen.Tests;
 public class NwOpenQueryBuilderTests
 {
     private readonly Mock<HttpMessageHandler> _httpMessageHandlerMock;
-    private readonly Mock<ILogger<NWOpenService>> _loggerMock;
     private readonly NWOpenService _nwOpenService;
 
     public NwOpenQueryBuilderTests()
     {
         _httpMessageHandlerMock = new();
         HttpClient httpClient = new(_httpMessageHandlerMock.Object);
-        _loggerMock = new();
-        _nwOpenService = new(httpClient, _loggerMock.Object);
+        _nwOpenService = new(httpClient);
     }
 
     [Fact]
@@ -115,11 +114,9 @@ public class NwOpenQueryBuilderTests
             .Query()
             .WithTitle("Test")
             .WithNumberOfResults(1);
-
-        NWOpenResult? result = await queryBuilder.Execute();
-
-        // Assert
-        Assert.Null(result);
+        
+        // Act
+        await Assert.ThrowsAsync<NWOpenException>(() => queryBuilder.Execute());
     }
 
     [Fact]
@@ -136,18 +133,9 @@ public class NwOpenQueryBuilderTests
             .Query()
             .WithTitle("Test")
             .WithNumberOfResults(1);
-
-        NWOpenResult? result = await queryBuilder.Execute();
-
-        Assert.Null(result);
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed to get results from NWOpen")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
-            Times.Once);
+        
+        // Act
+        await Assert.ThrowsAsync<NWOpenException>(async () => await queryBuilder.Execute());
     }
 
     [Fact]

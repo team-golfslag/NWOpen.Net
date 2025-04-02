@@ -20,11 +20,11 @@ public class SummaryUpdate
     /// will be returned.
     /// </summary>
     [JsonPropertyName("update_en")]
-    public required string UpdateEn { get; set; }
+    public string? UpdateEn { get; set; }
 
     /// <summary>
     /// Update of the public summary of the project in English.
     /// </summary>
     [JsonPropertyName("update_nl")]
-    public required string UpdateNl { get; set; }
+    public string? UpdateNl { get; set; }
 }

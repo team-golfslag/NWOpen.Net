@@ -13,7 +13,7 @@ public class Author
     /// Last name of the project member.
     /// </summary>
     [JsonPropertyName("last_name")]
-    public required string LastName { get; set; }
+    public string? LastName { get; set; }
 
     /// <summary>
     /// Initials of the project member.
@@ -34,7 +34,7 @@ public class Author
     public string? Prefix { get; set; }
 
     [JsonPropertyName("role")]
-    public required string Role { get; set; }
+    public string? Role { get; set; }
 
     /// <summary>
     /// Index number of the author.

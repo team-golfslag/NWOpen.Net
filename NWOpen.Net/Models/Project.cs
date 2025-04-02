@@ -52,7 +52,7 @@ public class Project
     /// Title of the project.
     /// </summary>
     [JsonPropertyName("title")]
-    public required string Title { get; set; }
+    public string? Title { get; set; }
 
     /// <summary>
     /// ID of the call under which the project falls.
@@ -64,19 +64,19 @@ public class Project
     /// Name of the call under which the project falls.
     /// </summary>
     [JsonPropertyName("funding_scheme")]
-    public required string FundingScheme { get; set; }
+    public string? FundingScheme { get; set; }
 
     /// <summary>
     /// NWO Domain under which the funding has been allocated to the project.
     /// </summary>
     [JsonPropertyName("department")]
-    public required string Department { get; set; }
+    public string? Department { get; set; }
 
     /// <summary>
     /// NWO Sub-domain under which the funding has been allocated to the project.
     /// </summary>
     [JsonPropertyName("sub_department")]
-    public required string SubDepartment { get; set; }
+    public string? SubDepartment { get; set; }
 
     /// <summary>
     /// Actual start date of the project.
@@ -94,13 +94,13 @@ public class Project
     /// Scientific summary of the project in Dutch.
     /// </summary>
     [JsonPropertyName("summary_nl")]
-    public required string SummaryNl { get; set; }
+    public string? SummaryNl { get; set; }
 
     /// <summary>
     /// Scientific summary of the project in English.
     /// </summary>
     [JsonPropertyName("summary_en")]
-    public required string SummaryEn { get; set; }
+    public string? SummaryEn { get; set; }
 
     [JsonPropertyName("summary_updates")]
     public List<SummaryUpdate>? SummaryUpdates { get; set; }

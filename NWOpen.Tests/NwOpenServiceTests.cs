@@ -8,6 +8,7 @@ using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
+using NWOpen.Net.Exceptions;
 using NWOpen.Net.Models;
 using NWOpen.Net.Services;
 
@@ -16,15 +17,13 @@ namespace NWOpen.Tests;
 public class NwOpenServiceTests
 {
     private readonly Mock<HttpMessageHandler> _httpMessageHandlerMock;
-    private readonly Mock<ILogger<NWOpenService>> _loggerMock;
     private readonly NWOpenService _nwOpenService;
 
     public NwOpenServiceTests()
     {
         _httpMessageHandlerMock = new();
         HttpClient httpClient = new(_httpMessageHandlerMock.Object);
-        _loggerMock = new();
-        _nwOpenService = new(httpClient, _loggerMock.Object);
+        _nwOpenService = new(httpClient);
     }
 
     [Fact]
@@ -145,17 +144,8 @@ public class NwOpenServiceTests
                 ItExpr.IsAny<HttpRequestMessage>(),
                 ItExpr.IsAny<CancellationToken>())
             .ThrowsAsync(new HttpRequestException("Failed to get results from NWOpen"));
-
-        Project? result = await _nwOpenService.GetProject("123");
-        Assert.Null(result);
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed to get project from NWOpen")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
-            Times.Once);
+        
+        await Assert.ThrowsAsync<NWOpenException>(() => _nwOpenService.GetProject("123"));
     }
 
     [Fact]
@@ -171,16 +161,7 @@ public class NwOpenServiceTests
                 StatusCode = HttpStatusCode.OK,
                 Content = new StringContent("Invalid JSON"),
             });
-
-        Project? result = await _nwOpenService.GetProject("123");
-        Assert.Null(result);
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Error,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed to deserialize project from NWOpen")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()!),
-            Times.Once);
+        
+        await Assert.ThrowsAsync<NWOpenException>(() => _nwOpenService.GetProject("123"));
     }
 }

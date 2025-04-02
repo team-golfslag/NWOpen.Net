@@ -6,6 +6,7 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
+using NWOpen.Net.Exceptions;
 using NWOpen.Net.Models;
 
 namespace NWOpen.Net.Services;
@@ -15,7 +16,6 @@ namespace NWOpen.Net.Services;
 /// </summary>
 public sealed class NWOpenService(
     HttpClient httpClient,
-    ILogger<NWOpenService> logger,
     NWOpenServiceOptions? options = null) : IDisposable
 {
     private readonly NWOpenServiceOptions _options = options ?? new NWOpenServiceOptions();
@@ -35,13 +35,11 @@ public sealed class NWOpenService(
         }
         catch (HttpRequestException e)
         {
-            logger.LogError(e, "Failed to get results from NWOpen");
-            return null;
+            throw new NWOpenException("Failed to get results from NWOpen", e);
         }
         catch (JsonException e)
         {
-            logger.LogError(e, "Failed to deserialize results from NWOpen");
-            return null;
+            throw new NWOpenException("Failed to deserialize results from NWOpen", e);
         }
     }
 
@@ -61,13 +59,11 @@ public sealed class NWOpenService(
         }
         catch (HttpRequestException e)
         {
-            logger.LogError(e, "Failed to get project from NWOpen");
-            return null;
+            throw new NWOpenException("Failed to get project from NWOpen", e);
         }
-        catch (JsonException e)
+        catch (JsonException e) 
         {
-            logger.LogError(e, "Failed to deserialize project from NWOpen");
-            return null;
+            throw new NWOpenException("Failed to get project from NWOpen", e);
         }
     }
 
