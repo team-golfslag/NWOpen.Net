@@ -6,6 +6,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
 using NWOpen.Net.Exceptions;
@@ -22,8 +23,31 @@ public class NwOpenServiceTests
     public NwOpenServiceTests()
     {
         _httpMessageHandlerMock = new();
-        HttpClient httpClient = new(_httpMessageHandlerMock.Object);
-        _nwOpenService = new(httpClient);
+
+        HttpClient httpClient = new(_httpMessageHandlerMock.Object)
+        {
+            BaseAddress = new("https://api.nwopen.example")
+        };
+
+        var optionsMock = new Mock<IOptions<NWOpenServiceOptions>>();
+        optionsMock
+            .Setup(o => o.Value)
+            .Returns(new NWOpenServiceOptions
+            {
+                BaseUrl = "https://api.nwopen.example",
+                JsonSerializerOptions = new()
+                {
+                    PropertyNameCaseInsensitive = true
+                }
+            });
+
+        var loggerMock = new Mock<ILogger<NWOpenService>>();
+
+        _nwOpenService = new(
+            httpClient,
+            optionsMock.Object,
+            loggerMock.Object
+        );
     }
 
     [Fact]
@@ -40,7 +64,7 @@ public class NwOpenServiceTests
             FundingScheme = "Open technologieprogramma OTP 2022 2022-9",
             Department = "Toegepaste en Technische Wetenschappen",
             SubDepartment = "Toegepaste en Technische Wetenschappen",
-            StartDate = new DateTime(2024, 3, 1),
+            StartDate = new DateTime(2024, 3, 1, 0,0,0, DateTimeKind.Utc),
             EndDate = null,
             SummaryNl = "summarynl",
             SummaryEn = "summaryen",
@@ -104,10 +128,10 @@ public class NwOpenServiceTests
             {
                 ApiType = "NWO Projects API",
                 Version = "1.0.1",
-                ReleaseDate = new DateTime(2024, 5, 2),
+                ReleaseDate = new DateTime(2024, 5, 2, 0,0,0, DateTimeKind.Utc),
                 Funder = "501100003246",
                 RorId = "https://ror.org/04jsz6e67",
-                Date = new DateTime(2024, 6, 4),
+                Date = new DateTime(2024, 6, 4, 0,0,0, DateTimeKind.Utc),
                 Count = 26,
                 PerPage = 10,
                 Pages = 3,
@@ -126,7 +150,7 @@ public class NwOpenServiceTests
                 Content = JsonContent.Create(mockResult),
             });
 
-        Project? result = await _nwOpenService.GetProject("20447");
+        Project? result = await _nwOpenService.GetProjectAsync("20447");
 
         Assert.NotNull(result);
         Assert.Equal("20447", result.ProjectId);
@@ -145,7 +169,7 @@ public class NwOpenServiceTests
                 ItExpr.IsAny<CancellationToken>())
             .ThrowsAsync(new HttpRequestException("Failed to get results from NWOpen"));
         
-        await Assert.ThrowsAsync<NWOpenException>(() => _nwOpenService.GetProject("123"));
+        await Assert.ThrowsAsync<NWOpenException>(() => _nwOpenService.GetProjectAsync("123"));
     }
 
     [Fact]
@@ -162,6 +186,6 @@ public class NwOpenServiceTests
                 Content = new StringContent("Invalid JSON"),
             });
         
-        await Assert.ThrowsAsync<NWOpenException>(() => _nwOpenService.GetProject("123"));
+        await Assert.ThrowsAsync<NWOpenException>(() => _nwOpenService.GetProjectAsync("123"));
     }
 }
