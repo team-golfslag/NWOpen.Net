@@ -193,7 +193,7 @@ public class NwOpenQueryBuilder
     /// Execute the query.
     /// </summary>
     /// <returns> The result of the query. </returns>
-    public async Task<NWOpenResult?> Execute()
+    public async Task<NWOpenResult?> ExecuteAsync()
     {
         // Build the query
         List<string> query = BuildQueries();
@@ -202,7 +202,7 @@ public class NwOpenQueryBuilder
         List<NWOpenResult> results = [];
         foreach (string q in query)
         {
-            NWOpenResult? res = await _service.PerformQuery(q);
+            NWOpenResult? res = await _service.PerformQueryAsync(q);
             if (res is not null) results.Add(res);
         }
 
@@ -225,10 +225,8 @@ public class NwOpenQueryBuilder
     {
         int newCount = 0;
         List<Project> projects = [];
-        foreach (Project project in result.Projects)
+        foreach (Project project in result.Projects.Where(project => project.Title == _titleQuery))
         {
-            if (project.Title != _titleQuery) continue;
-
             newCount++;
             projects.Add(project);
         }

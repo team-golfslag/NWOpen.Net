@@ -6,6 +6,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
 using NWOpen.Net;
@@ -23,41 +24,58 @@ public class NwOpenQueryBuilderTests
     public NwOpenQueryBuilderTests()
     {
         _httpMessageHandlerMock = new();
-        HttpClient httpClient = new(_httpMessageHandlerMock.Object);
-        _nwOpenService = new(httpClient);
+
+        HttpClient httpClient = new(_httpMessageHandlerMock.Object)
+        {
+            BaseAddress = new("https://api.nwopen.example"),
+        };
+
+        var optionsMock = new Mock<IOptions<NWOpenServiceOptions>>();
+        optionsMock
+            .Setup(o => o.Value)
+            .Returns(new NWOpenServiceOptions
+            {
+                BaseUrl = "https://api.nwopen.example",
+                JsonSerializerOptions = new()
+                {
+                    PropertyNameCaseInsensitive = true,
+                },
+            });
+
+        var loggerMock = new Mock<ILogger<NWOpenService>>();
+
+        _nwOpenService = new(
+            httpClient,
+            optionsMock.Object,
+            loggerMock.Object
+        );
     }
 
     [Fact]
-    public async Task Execute_ShouldReturnOrganizationsResult_WhenResponseIsValid()
+    public async Task ExecuteAsync_ShouldReturnOrganizationsResult_WhenResponseIsValid()
     {
+        // Arrange
         Project organization = new()
         {
             ProjectId = "20447",
-            GrantId = null,
-            ParentProjectId = null,
-            Title =
-                "Hybrid protein-lipid nanoparticles for targeted oligonucleotide delivery in endometriosis (HYPNODE)",
+            Title = "Hybrid protein-lipid nanoparticles for targeted oligonucleotide delivery in endometriosis (HYPNODE)",
             FundingSchemeId = 4851,
             FundingScheme = "Open technologieprogramma OTP 2022 2022-9",
             Department = "Toegepaste en Technische Wetenschappen",
             SubDepartment = "Toegepaste en Technische Wetenschappen",
-            StartDate = new DateTime(2024, 3, 1),
-            EndDate = null,
+            StartDate = new DateTime(2024, 3, 1, 0,0,0, DateTimeKind.Utc),
             SummaryNl = "summarynl",
             SummaryEn = "summaryen",
-            SummaryUpdates = [],
-            ProjectMembers = [],
-            Products = [],
         };
 
         Metadata metadata = new()
         {
             ApiType = "NWO Projects API",
             Version = "1.0.1",
-            ReleaseDate = new DateTime(2024, 5, 2),
+            ReleaseDate = new DateTime(2024, 5, 2, 0,0,0, DateTimeKind.Utc),
             Funder = "501100003246",
             RorId = "https://ror.org/04jsz6e67",
-            Date = new DateTime(2024, 6, 4),
+            Date = new DateTime(2024, 6, 4, 0,0,0, DateTimeKind.Utc),
             Count = 26,
             PerPage = 10,
             Pages = 3,
@@ -74,7 +92,8 @@ public class NwOpenQueryBuilderTests
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
                 ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>())
+                ItExpr.IsAny<CancellationToken>()
+            )
             .ReturnsAsync(new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
@@ -86,68 +105,78 @@ public class NwOpenQueryBuilderTests
             .WithTitle("Test")
             .WithNumberOfResults(1);
 
-        NWOpenResult? result = await queryBuilder.Execute();
+        // Act
+        NWOpenResult? result = await queryBuilder.ExecuteAsync();
 
+        // Assert
         Assert.NotNull(result);
         Assert.Single(result.Projects);
         Assert.Equal("20447", result.Projects[0].ProjectId);
         Assert.Equal(
             "Hybrid protein-lipid nanoparticles for targeted oligonucleotide delivery in endometriosis (HYPNODE)",
-            result.Projects[0].Title);
+            result.Projects[0].Title
+        );
     }
 
     [Fact]
-    public async Task Execute_ShouldReturnNull_WhenResponseIsInvalid()
+    public async Task ExecuteAsync_ShouldThrowOnInvalidJson()
     {
+        // Arrange: valid status but invalid JSON body
         _httpMessageHandlerMock.Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
                 ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>())
+                ItExpr.IsAny<CancellationToken>()
+            )
             .ReturnsAsync(new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
-                Content = new StringContent("Invalid JSON"),
+                Content = new StringContent("Not JSON"),
             });
 
         NwOpenQueryBuilder queryBuilder = _nwOpenService
             .Query()
             .WithTitle("Test")
             .WithNumberOfResults(1);
-        
-        // Act
-        await Assert.ThrowsAsync<NWOpenException>(() => queryBuilder.Execute());
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NWOpenException>(()
+            => queryBuilder.ExecuteAsync()
+        );
     }
 
     [Fact]
-    public async Task Execute_ShouldLogError_WhenRequestExceptionIsThrown()
+    public async Task ExecuteAsync_ShouldThrowAndLog_OnHttpRequestException()
     {
+        // Arrange: handler throws
         _httpMessageHandlerMock.Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
                 ItExpr.IsAny<HttpRequestMessage>(),
-                ItExpr.IsAny<CancellationToken>())
-            .ThrowsAsync(new HttpRequestException("Failed to get results from NWOpen"));
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ThrowsAsync(new HttpRequestException("network gone"));
 
         NwOpenQueryBuilder queryBuilder = _nwOpenService
             .Query()
             .WithTitle("Test")
             .WithNumberOfResults(1);
-        
-        // Act
-        await Assert.ThrowsAsync<NWOpenException>(async () => await queryBuilder.Execute());
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NWOpenException>(()
+            => queryBuilder.ExecuteAsync()
+        );
     }
 
     [Fact]
-    public void BuildQuery_ShouldThrowArgumentException_WhenNumberOfResultsIsZero()
+    public void WithNumberOfResults_ShouldThrow_WhenZero()
     {
         NwOpenQueryBuilder queryBuilder = _nwOpenService.Query();
-
         Assert.Throws<ArgumentException>(() => queryBuilder.WithNumberOfResults(0));
     }
 
     [Fact]
-    public void BuildQuery_ShouldThrowArgumentException_WhenNumberOfResultsIsSetMultipleTimes()
+    public void WithNumberOfResults_ShouldThrow_WhenCalledTwice()
     {
         NwOpenQueryBuilder queryBuilder = _nwOpenService
             .Query()
@@ -157,7 +186,7 @@ public class NwOpenQueryBuilderTests
     }
 
     [Fact]
-    public void BuildQuery_ShouldThrowArgumentException_WhenQueryIsSetMultipleTimes()
+    public void WithTitle_ShouldThrow_WhenCalledTwice()
     {
         NwOpenQueryBuilder queryBuilder = _nwOpenService
             .Query()
@@ -167,7 +196,7 @@ public class NwOpenQueryBuilderTests
     }
 
     [Fact]
-    public void BuildQuery_ShouldReturnCorrectQueryString()
+    public void BuildQueries_ShouldReturnExpectedString()
     {
         NwOpenQueryBuilder queryBuilder = _nwOpenService
             .Query()
@@ -175,16 +204,18 @@ public class NwOpenQueryBuilderTests
             .WithTitle("Test")
             .WithNumberOfResults(1)
             .WithMemberLastName("Doe")
-            .WithStartDateFrom(new(2020, 1, 1))
-            .WithStartDateUntil(new(2021, 1, 1))
-            .WithEndDateFrom(new(2021, 1, 1))
-            .WithEndDateUntil(new(2022, 1, 1))
+            .WithStartDateFrom(new(2020, 1, 1, 0,0,0, DateTimeKind.Utc))
+            .WithStartDateUntil(new(2021, 1, 1, 0,0,0, DateTimeKind.Utc))
+            .WithEndDateFrom(new(2021, 1, 1, 0,0,0, DateTimeKind.Utc))
+            .WithEndDateUntil(new(2022, 1, 1, 0,0,0, DateTimeKind.Utc))
             .WithRole("role");
 
-        string query = queryBuilder.BuildQueries()[0];
+        List<string> queries = queryBuilder.BuildQueries();
 
+        Assert.Single(queries);
         Assert.Equal(
             "per_page=1&organisation=%22Test%22&title=%22Test%22&role=%22role%22&last_name=%22Doe%22&rs_start_date=2020-01-01&re_start_date=2021-01-01&rs_end_date=2021-01-01&re_end_date=2022-01-01",
-            query);
+            queries[0]
+        );
     }
 }
