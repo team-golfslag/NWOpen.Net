@@ -172,7 +172,7 @@ public class NwOpenQueryBuilderTests
     [Fact]
     public void WithNumberOfResults_ShouldThrow_WhenZero()
     {
-        NWOpenQueryBuilder queryBuilder = _nwOpenService.Query();
+        INWOpenQueryBuilder queryBuilder = _nwOpenService.Query();
         Assert.Throws<ArgumentException>(() => queryBuilder.WithNumberOfResults(0));
     }
 
@@ -223,7 +223,7 @@ public class NwOpenQueryBuilderTests
     [Fact]
         public void WithOrganization_CalledTwice_ThrowsInvalidOperationException()
         {
-            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            INWOpenQueryBuilder builder = _nwOpenService.Query();
             builder.WithOrganization("TestOrg");
             Assert.Throws<InvalidOperationException>(() => builder.WithOrganization("OtherOrg"));
         }
@@ -231,7 +231,7 @@ public class NwOpenQueryBuilderTests
         [Fact]
         public void WithTitle_CalledTwice_ThrowsInvalidOperationException()
         {
-            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            INWOpenQueryBuilder builder = _nwOpenService.Query();
             builder.WithTitle("MyTitle");
             Assert.Throws<InvalidOperationException>(() => builder.WithTitle("AnotherTitle"));
         }
@@ -239,7 +239,7 @@ public class NwOpenQueryBuilderTests
         [Fact]
         public void WithRole_CalledTwice_ThrowsInvalidOperationException()
         {
-            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            INWOpenQueryBuilder builder = _nwOpenService.Query();
             builder.WithRole("RoleA");
             Assert.Throws<InvalidOperationException>(() => builder.WithRole("RoleB"));
         }
@@ -247,7 +247,7 @@ public class NwOpenQueryBuilderTests
         [Fact]
         public void WithMemberLastName_CalledTwice_ThrowsInvalidOperationException()
         {
-            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            INWOpenQueryBuilder builder = _nwOpenService.Query();
             builder.WithMemberLastName("Smith");
             Assert.Throws<InvalidOperationException>(() => builder.WithMemberLastName("Jones"));
         }
@@ -255,7 +255,7 @@ public class NwOpenQueryBuilderTests
         [Fact]
         public void WithStartDateFrom_CalledTwice_ThrowsInvalidOperationException()
         {
-            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            INWOpenQueryBuilder builder = _nwOpenService.Query();
             builder.WithStartDateFrom(new(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc));
             Assert.Throws<InvalidOperationException>(() => builder.WithStartDateFrom(new(2021, 1, 1, 0, 0, 0, DateTimeKind.Utc)));
         }
@@ -263,7 +263,7 @@ public class NwOpenQueryBuilderTests
         [Fact]
         public void WithStartDateUntil_CalledTwice_ThrowsInvalidOperationException()
         {
-            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            INWOpenQueryBuilder builder = _nwOpenService.Query();
             builder.WithStartDateUntil(new(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc));
             Assert.Throws<InvalidOperationException>(() => builder.WithStartDateUntil(new(2021, 1, 1, 0, 0, 0, DateTimeKind.Utc)));
         }
@@ -271,7 +271,7 @@ public class NwOpenQueryBuilderTests
         [Fact]
         public void WithEndDateFrom_CalledTwice_ThrowsInvalidOperationException()
         {
-            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            INWOpenQueryBuilder builder = _nwOpenService.Query();
             builder.WithEndDateFrom(new(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc));
             Assert.Throws<InvalidOperationException>(() => builder.WithEndDateFrom(new(2021, 1, 1, 0, 0, 0, DateTimeKind.Utc)));
         }
@@ -279,7 +279,7 @@ public class NwOpenQueryBuilderTests
         [Fact]
         public void WithEndDateUntil_CalledTwice_ThrowsInvalidOperationException()
         {
-            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            INWOpenQueryBuilder builder = _nwOpenService.Query();
             builder.WithEndDateUntil(new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc));
             Assert.Throws<InvalidOperationException>(() => builder.WithEndDateUntil(new DateTime(2021, 1, 1, 0, 0, 0, DateTimeKind.Utc)));
         }
@@ -287,14 +287,14 @@ public class NwOpenQueryBuilderTests
         [Fact]
         public void WithNumberOfResults_Zero_ThrowsArgumentException()
         {
-            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            INWOpenQueryBuilder builder = _nwOpenService.Query();
             Assert.Throws<ArgumentException>(() => builder.WithNumberOfResults(0));
         }
 
         [Fact]
         public void WithNumberOfResults_CalledTwice_ThrowsInvalidOperationException()
         {
-            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            INWOpenQueryBuilder builder = _nwOpenService.Query();
             builder.WithNumberOfResults(5);
             Assert.Throws<InvalidOperationException>(() => builder.WithNumberOfResults(10));
         }
@@ -302,7 +302,7 @@ public class NwOpenQueryBuilderTests
         [Fact]
         public void BuildQueries_ResultLessThanPageSize_UsesPerPage()
         {
-            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            INWOpenQueryBuilder builder = _nwOpenService.Query();
             var queries = builder
                 .WithNumberOfResults(20)
                 .BuildQueries();
@@ -315,7 +315,7 @@ public class NwOpenQueryBuilderTests
         [Fact]
         public void BuildQueries_ExactPageSize_UsesPageOne()
         {
-            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            INWOpenQueryBuilder builder = _nwOpenService.Query();
             var queries = builder
                 .WithNumberOfResults(100)
                 .BuildQueries();
@@ -327,7 +327,7 @@ public class NwOpenQueryBuilderTests
         [Fact]
         public void BuildQueries_MoreThanPageSize_GeneratesMultiplePageQueries()
         {
-            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            INWOpenQueryBuilder builder = _nwOpenService.Query();
             const int total = 250;
             var queries = builder
                 .WithNumberOfResults(total)
@@ -342,7 +342,7 @@ public class NwOpenQueryBuilderTests
         [Fact]
         public void EncodedFields_AppearInQueryString()
         {
-            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            INWOpenQueryBuilder builder = _nwOpenService.Query();
             const string org = "Org Name";
             const string title = "Title Value";
 
