@@ -11,5 +11,5 @@ public interface INWOpenService
 {
     Task<NWOpenResult?> PerformQueryAsync(string query);
     Task<Project?> GetProjectAsync(string projectId);
-    NWOpenQueryBuilder Query();
+    INWOpenQueryBuilder Query();
 }
