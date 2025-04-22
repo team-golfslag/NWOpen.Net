@@ -7,9 +7,9 @@ using NWOpen.Net.Models;
 
 namespace NWOpen.Net.Services;
 
-internal interface INWOpenService
+public interface INWOpenService
 {
     Task<NWOpenResult?> PerformQueryAsync(string query);
     Task<Project?> GetProjectAsync(string projectId);
-    NwOpenQueryBuilder Query();
+    NWOpenQueryBuilder Query();
 }

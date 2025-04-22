@@ -100,7 +100,7 @@ public class NwOpenQueryBuilderTests
                 Content = JsonContent.Create(organizationResult),
             });
 
-        NwOpenQueryBuilder queryBuilder = _nwOpenService
+        INWOpenQueryBuilder queryBuilder = _nwOpenService
             .Query()
             .WithTitle("Test")
             .WithNumberOfResults(1);
@@ -134,7 +134,7 @@ public class NwOpenQueryBuilderTests
                 Content = new StringContent("Not JSON"),
             });
 
-        NwOpenQueryBuilder queryBuilder = _nwOpenService
+        INWOpenQueryBuilder queryBuilder = _nwOpenService
             .Query()
             .WithTitle("Test")
             .WithNumberOfResults(1);
@@ -157,7 +157,7 @@ public class NwOpenQueryBuilderTests
             )
             .ThrowsAsync(new HttpRequestException("network gone"));
 
-        NwOpenQueryBuilder queryBuilder = _nwOpenService
+        INWOpenQueryBuilder queryBuilder = _nwOpenService
             .Query()
             .WithTitle("Test")
             .WithNumberOfResults(1);
@@ -171,14 +171,14 @@ public class NwOpenQueryBuilderTests
     [Fact]
     public void WithNumberOfResults_ShouldThrow_WhenZero()
     {
-        NwOpenQueryBuilder queryBuilder = _nwOpenService.Query();
+        NWOpenQueryBuilder queryBuilder = _nwOpenService.Query();
         Assert.Throws<ArgumentException>(() => queryBuilder.WithNumberOfResults(0));
     }
 
     [Fact]
     public void WithNumberOfResults_ShouldThrow_WhenCalledTwice()
     {
-        NwOpenQueryBuilder queryBuilder = _nwOpenService
+        INWOpenQueryBuilder queryBuilder = _nwOpenService
             .Query()
             .WithNumberOfResults(1);
 
@@ -188,7 +188,7 @@ public class NwOpenQueryBuilderTests
     [Fact]
     public void WithTitle_ShouldThrow_WhenCalledTwice()
     {
-        NwOpenQueryBuilder queryBuilder = _nwOpenService
+        INWOpenQueryBuilder queryBuilder = _nwOpenService
             .Query()
             .WithTitle("Test");
 
@@ -198,7 +198,7 @@ public class NwOpenQueryBuilderTests
     [Fact]
     public void BuildQueries_ShouldReturnExpectedString()
     {
-        NwOpenQueryBuilder queryBuilder = _nwOpenService
+        INWOpenQueryBuilder queryBuilder = _nwOpenService
             .Query()
             .WithOrganization("Test")
             .WithTitle("Test")

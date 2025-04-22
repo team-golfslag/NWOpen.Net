@@ -76,5 +76,5 @@ public class NWOpenService : INWOpenService
         }
     }
 
-    public NwOpenQueryBuilder Query() => new(this);
+    public NWOpenQueryBuilder Query() => new(this);
 }
