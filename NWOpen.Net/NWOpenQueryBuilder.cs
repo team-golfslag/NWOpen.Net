@@ -12,7 +12,7 @@ namespace NWOpen.Net;
 /// <summary>
 /// A builder class to create a query to search for projects.
 /// </summary>
-public class NwOpenQueryBuilder
+public class NWOpenQueryBuilder : INWOpenQueryBuilder
 {
     /// <summary>
     /// The number of results per page.
@@ -60,7 +60,7 @@ public class NwOpenQueryBuilder
     /// </summary>
     private string? _titleQuery;
 
-    internal NwOpenQueryBuilder(NWOpenService service)
+    internal NWOpenQueryBuilder(NWOpenService service)
     {
         _service = service;
     }
@@ -71,7 +71,7 @@ public class NwOpenQueryBuilder
     /// <param name="organization">The organization name to filter by.</param>
     /// <remarks> Can only be called once. </remarks>
     /// <exception cref="InvalidOperationException"> Organization can only be set once </exception>
-    public NwOpenQueryBuilder WithOrganization(string organization)
+    public INWOpenQueryBuilder WithOrganization(string organization)
     {
         if (_organizationQuery != null)
             throw new InvalidOperationException("Organization can only be set once");
@@ -85,7 +85,7 @@ public class NwOpenQueryBuilder
     /// <param name="title">The title to filter by.</param>
     /// <param name="exact">Whether the title should be an exact match.</param>
     /// <exception cref="InvalidOperationException"> Title can only be set once </exception>
-    public NwOpenQueryBuilder WithTitle(string title, bool exact = false)
+    public INWOpenQueryBuilder WithTitle(string title, bool exact = false)
     {
         if (_titleQuery != null)
             throw new InvalidOperationException("Title can only be set once");
@@ -99,7 +99,7 @@ public class NwOpenQueryBuilder
     /// </summary>
     /// <param name="role">The role to filter by.</param>
     /// <exception cref="InvalidOperationException"> Role can only be set once </exception>
-    public NwOpenQueryBuilder WithRole(string role)
+    public INWOpenQueryBuilder WithRole(string role)
     {
         if (_roleQuery != null)
             throw new InvalidOperationException("Role can only be set once");
@@ -112,7 +112,7 @@ public class NwOpenQueryBuilder
     /// </summary>
     /// <param name="lastName">The last name to filter by.</param>
     /// <exception cref="InvalidOperationException"> Last name can only be set once </exception>
-    public NwOpenQueryBuilder WithMemberLastName(string lastName)
+    public INWOpenQueryBuilder WithMemberLastName(string lastName)
     {
         if (_lastNameQuery != null)
             throw new InvalidOperationException("Last name can only be set once");
@@ -125,7 +125,7 @@ public class NwOpenQueryBuilder
     /// </summary>
     /// <param name="from">The start date beginning of the range.</param>
     /// <exception cref="InvalidOperationException"> Start date from can only be set once </exception>
-    public NwOpenQueryBuilder WithStartDateFrom(DateTime from)
+    public INWOpenQueryBuilder WithStartDateFrom(DateTime from)
     {
         if (_startDateFrom.HasValue)
             throw new InvalidOperationException("Start date from can only be set once");
@@ -138,7 +138,7 @@ public class NwOpenQueryBuilder
     /// </summary>
     /// <param name="until">The start date end of the range.</param>
     /// <exception cref="InvalidOperationException"> Start date until can only be set once </exception>
-    public NwOpenQueryBuilder WithStartDateUntil(DateTime until)
+    public INWOpenQueryBuilder WithStartDateUntil(DateTime until)
     {
         if (_startDateUntil.HasValue)
             throw new InvalidOperationException("Start date until can only be set once");
@@ -151,7 +151,7 @@ public class NwOpenQueryBuilder
     /// </summary>
     /// <param name="from">The end date beginning of the range.</param>
     /// <exception cref="InvalidOperationException"> End date from can only be set once </exception>
-    public NwOpenQueryBuilder WithEndDateFrom(DateTime from)
+    public INWOpenQueryBuilder WithEndDateFrom(DateTime from)
     {
         if (_endDateFrom.HasValue)
             throw new InvalidOperationException("End date from can only be set once");
@@ -164,7 +164,7 @@ public class NwOpenQueryBuilder
     /// </summary>
     /// <param name="until">The end date end of the range.</param>
     /// <exception cref="InvalidOperationException"> End date until can only be set once </exception>
-    public NwOpenQueryBuilder WithEndDateUntil(DateTime until)
+    public INWOpenQueryBuilder WithEndDateUntil(DateTime until)
     {
         if (_endDateUntil.HasValue)
             throw new InvalidOperationException("End date until can only be set once");
@@ -179,7 +179,7 @@ public class NwOpenQueryBuilder
     /// <remarks> Must be greater than 0. Can only be set once. </remarks>
     /// <exception cref="InvalidOperationException"> Number of results can only be set once </exception>
     /// <exception cref="ArgumentException"> Number of results must be greater than 0 </exception>
-    public NwOpenQueryBuilder WithNumberOfResults(int numberOfResults)
+    public INWOpenQueryBuilder WithNumberOfResults(int numberOfResults)
     {
         if (numberOfResults <= 0)
             throw new ArgumentException("Number of results must be greater than 0");

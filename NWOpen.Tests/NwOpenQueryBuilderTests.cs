@@ -5,6 +5,7 @@
 
 using System.Net;
 using System.Net.Http.Json;
+using System.Web;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -100,7 +101,7 @@ public class NwOpenQueryBuilderTests
                 Content = JsonContent.Create(organizationResult),
             });
 
-        NwOpenQueryBuilder queryBuilder = _nwOpenService
+        INWOpenQueryBuilder queryBuilder = _nwOpenService
             .Query()
             .WithTitle("Test")
             .WithNumberOfResults(1);
@@ -134,7 +135,7 @@ public class NwOpenQueryBuilderTests
                 Content = new StringContent("Not JSON"),
             });
 
-        NwOpenQueryBuilder queryBuilder = _nwOpenService
+        INWOpenQueryBuilder queryBuilder = _nwOpenService
             .Query()
             .WithTitle("Test")
             .WithNumberOfResults(1);
@@ -157,7 +158,7 @@ public class NwOpenQueryBuilderTests
             )
             .ThrowsAsync(new HttpRequestException("network gone"));
 
-        NwOpenQueryBuilder queryBuilder = _nwOpenService
+        INWOpenQueryBuilder queryBuilder = _nwOpenService
             .Query()
             .WithTitle("Test")
             .WithNumberOfResults(1);
@@ -171,14 +172,14 @@ public class NwOpenQueryBuilderTests
     [Fact]
     public void WithNumberOfResults_ShouldThrow_WhenZero()
     {
-        NwOpenQueryBuilder queryBuilder = _nwOpenService.Query();
+        NWOpenQueryBuilder queryBuilder = _nwOpenService.Query();
         Assert.Throws<ArgumentException>(() => queryBuilder.WithNumberOfResults(0));
     }
 
     [Fact]
     public void WithNumberOfResults_ShouldThrow_WhenCalledTwice()
     {
-        NwOpenQueryBuilder queryBuilder = _nwOpenService
+        INWOpenQueryBuilder queryBuilder = _nwOpenService
             .Query()
             .WithNumberOfResults(1);
 
@@ -188,7 +189,7 @@ public class NwOpenQueryBuilderTests
     [Fact]
     public void WithTitle_ShouldThrow_WhenCalledTwice()
     {
-        NwOpenQueryBuilder queryBuilder = _nwOpenService
+        INWOpenQueryBuilder queryBuilder = _nwOpenService
             .Query()
             .WithTitle("Test");
 
@@ -198,7 +199,7 @@ public class NwOpenQueryBuilderTests
     [Fact]
     public void BuildQueries_ShouldReturnExpectedString()
     {
-        NwOpenQueryBuilder queryBuilder = _nwOpenService
+        INWOpenQueryBuilder queryBuilder = _nwOpenService
             .Query()
             .WithOrganization("Test")
             .WithTitle("Test")
@@ -218,4 +219,145 @@ public class NwOpenQueryBuilderTests
             queries[0]
         );
     }
+    
+    [Fact]
+        public void WithOrganization_CalledTwice_ThrowsInvalidOperationException()
+        {
+            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            builder.WithOrganization("TestOrg");
+            Assert.Throws<InvalidOperationException>(() => builder.WithOrganization("OtherOrg"));
+        }
+
+        [Fact]
+        public void WithTitle_CalledTwice_ThrowsInvalidOperationException()
+        {
+            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            builder.WithTitle("MyTitle");
+            Assert.Throws<InvalidOperationException>(() => builder.WithTitle("AnotherTitle"));
+        }
+
+        [Fact]
+        public void WithRole_CalledTwice_ThrowsInvalidOperationException()
+        {
+            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            builder.WithRole("RoleA");
+            Assert.Throws<InvalidOperationException>(() => builder.WithRole("RoleB"));
+        }
+
+        [Fact]
+        public void WithMemberLastName_CalledTwice_ThrowsInvalidOperationException()
+        {
+            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            builder.WithMemberLastName("Smith");
+            Assert.Throws<InvalidOperationException>(() => builder.WithMemberLastName("Jones"));
+        }
+
+        [Fact]
+        public void WithStartDateFrom_CalledTwice_ThrowsInvalidOperationException()
+        {
+            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            builder.WithStartDateFrom(new(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+            Assert.Throws<InvalidOperationException>(() => builder.WithStartDateFrom(new(2021, 1, 1, 0, 0, 0, DateTimeKind.Utc)));
+        }
+
+        [Fact]
+        public void WithStartDateUntil_CalledTwice_ThrowsInvalidOperationException()
+        {
+            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            builder.WithStartDateUntil(new(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+            Assert.Throws<InvalidOperationException>(() => builder.WithStartDateUntil(new(2021, 1, 1, 0, 0, 0, DateTimeKind.Utc)));
+        }
+
+        [Fact]
+        public void WithEndDateFrom_CalledTwice_ThrowsInvalidOperationException()
+        {
+            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            builder.WithEndDateFrom(new(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+            Assert.Throws<InvalidOperationException>(() => builder.WithEndDateFrom(new(2021, 1, 1, 0, 0, 0, DateTimeKind.Utc)));
+        }
+
+        [Fact]
+        public void WithEndDateUntil_CalledTwice_ThrowsInvalidOperationException()
+        {
+            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            builder.WithEndDateUntil(new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+            Assert.Throws<InvalidOperationException>(() => builder.WithEndDateUntil(new DateTime(2021, 1, 1, 0, 0, 0, DateTimeKind.Utc)));
+        }
+
+        [Fact]
+        public void WithNumberOfResults_Zero_ThrowsArgumentException()
+        {
+            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            Assert.Throws<ArgumentException>(() => builder.WithNumberOfResults(0));
+        }
+
+        [Fact]
+        public void WithNumberOfResults_CalledTwice_ThrowsInvalidOperationException()
+        {
+            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            builder.WithNumberOfResults(5);
+            Assert.Throws<InvalidOperationException>(() => builder.WithNumberOfResults(10));
+        }
+
+        [Fact]
+        public void BuildQueries_ResultLessThanPageSize_UsesPerPage()
+        {
+            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            var queries = builder
+                .WithNumberOfResults(20)
+                .BuildQueries();
+
+            Assert.Single(queries);
+            string q = queries[0];
+            Assert.StartsWith("per_page=20", q);
+        }
+
+        [Fact]
+        public void BuildQueries_ExactPageSize_UsesPageOne()
+        {
+            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            var queries = builder
+                .WithNumberOfResults(100)
+                .BuildQueries();
+
+            Assert.Single(queries);
+            Assert.Equal("page=1", queries.Single());
+        }
+
+        [Fact]
+        public void BuildQueries_MoreThanPageSize_GeneratesMultiplePageQueries()
+        {
+            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            const int total = 250;
+            var queries = builder
+                .WithNumberOfResults(total)
+                .BuildQueries();
+
+            Assert.Equal(3, queries.Count);
+            Assert.Contains("page=1", queries);
+            Assert.Contains("page=2", queries);
+            Assert.Contains("page=3", queries);
+        }
+
+        [Fact]
+        public void EncodedFields_AppearInQueryString()
+        {
+            NWOpenQueryBuilder builder = _nwOpenService.Query();
+            const string org = "Org Name";
+            const string title = "Title Value";
+
+            var queries = builder
+                .WithOrganization(org)
+                .WithTitle(title)
+                .WithNumberOfResults(1)
+                .BuildQueries();
+
+            string q = queries.Single();
+            // Check that the quotes around the values are URL-encoded
+            string encodedOrg = HttpUtility.UrlEncode("\"" + org + "\"");
+            string encodedTitle = HttpUtility.UrlEncode("\"" + title + "\"");
+
+            Assert.Contains($"organisation={encodedOrg}", q);
+            Assert.Contains($"title={encodedTitle}", q);
+        }
 }
